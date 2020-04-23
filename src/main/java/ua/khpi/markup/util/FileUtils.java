@@ -25,7 +25,7 @@ public class FileUtils {
     }
 
     public static String getFileContent(Path pathToFile) throws IOException {
-        return Files.readString(pathToFile);
+        return new String(Files.readAllBytes(pathToFile));
     }
 
     public static void saveProcessedFile(Path pathToFile, String fileContent) {
@@ -34,18 +34,18 @@ public class FileUtils {
     }
 
     private static String getUpdatedFileName(Path pathToFile) {
-        var oldFileName = pathToFile.getFileName().toString();
+        String oldFileName = pathToFile.getFileName().toString();
         return oldFileName.replace(TXT_EXTENSION, PROCESSED_FILE_EXTENSION);
     }
 
     private static boolean isUnprocessedTxtFile(Path pathToFile) {
-        var fileName = pathToFile.getFileName().toString();
+        String fileName = pathToFile.getFileName().toString();
         return !fileName.endsWith(PROCESSED_FILE_EXTENSION) && fileName.endsWith(TXT_EXTENSION);
     }
 
     private static void saveFileWithNewContent(Path pathToFile, String fileContent) {
         try {
-            Files.writeString(pathToFile, fileContent);
+            Files.write(pathToFile, fileContent.getBytes());
         } catch (IOException e) {
             throw new FileSavingException(e);
         }

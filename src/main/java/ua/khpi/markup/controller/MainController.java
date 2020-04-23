@@ -18,9 +18,7 @@ import ua.khpi.markup.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 import static ua.khpi.markup.util.ControllerUtils.showAlert;
 
@@ -58,7 +56,7 @@ public class MainController {
     void choosePathToTexts(ActionEvent event) {
         processingFinished();
 
-        var directoryWithTexts = getDirectoryWithTextsToProcess(event);
+        File directoryWithTexts = getDirectoryWithTextsToProcess(event);
         if (directoryWithTexts == null) return;
 
         try {
@@ -71,13 +69,13 @@ public class MainController {
 
     @FXML
     void markTextSegment(ContextMenuEvent event) {
-        var selectedTextSegment = textArea.getSelectedText();
-        if (selectedTextSegment.isBlank()) return;
+        String selectedTextSegment = textArea.getSelectedText();
+        if (selectedTextSegment.trim().isEmpty()) return;
 
-        var markedTextSegment = markupPrefix + selectedTextSegment + markupSuffix;
+        String markedTextSegment = markupPrefix + selectedTextSegment + markupSuffix;
 
-        var text = textArea.getText();
-        var updatedText = text.replaceFirst(selectedTextSegment, markedTextSegment);
+        String text = textArea.getText();
+        String updatedText = text.replaceFirst(selectedTextSegment, markedTextSegment);
 
         textArea.deselect();
         textArea.setText(updatedText);
@@ -86,15 +84,15 @@ public class MainController {
 
     @FXML
     void saveText(ActionEvent event) {
-        var processedText = textArea.getText();
+        String processedText = textArea.getText();
 
-        if (processedText.isBlank()) {
+        if (processedText.trim().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Text is blank", "You can not save empty text");
             return;
         }
 
         if (currentFileChangeHistory.peekFirst() == currentFileChangeHistory.peekLast()) {
-            var changesDetected = showAlert(Alert.AlertType.CONFIRMATION, "No changes detected",
+            Optional<ButtonType> changesDetected = showAlert(Alert.AlertType.CONFIRMATION, "No changes detected",
                     "You are trying to mark file as processed however you did not make any changes to it. Proceed?");
             if ((changesDetected.isPresent()) && !(changesDetected.get() == ButtonType.OK)) {
                 return;
@@ -115,7 +113,7 @@ public class MainController {
 
     @FXML
     void skipText(ActionEvent event) {
-        var wannaSkip = showAlert(Alert.AlertType.CONFIRMATION, "Are you sure?",
+        Optional<ButtonType> wannaSkip = showAlert(Alert.AlertType.CONFIRMATION, "Are you sure?",
                 "This file will be skipped but will not be marked as processed");
         if ((wannaSkip.isPresent()) && (wannaSkip.get() == ButtonType.OK)) {
             processNextFile();
@@ -153,13 +151,13 @@ public class MainController {
     }
 
     private File getDirectoryWithTextsToProcess(ActionEvent event) {
-        var dirChooser = new DirectoryChooser();
+        DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Choose a folder");
         return dirChooser.showDialog(((Node) event.getSource()).getScene().getWindow());
     }
 
     private void initializeProcessing(File directoryWithTexts) throws IOException {
-        var filesToProcess = FileUtils.getFilesToProcess(directoryWithTexts);
+        List<Path> filesToProcess = FileUtils.getFilesToProcess(directoryWithTexts);
 
         if (filesToProcess.isEmpty()) {
             showAlert(Alert.AlertType.INFORMATION, "No files found",
@@ -167,7 +165,7 @@ public class MainController {
             return;
         }
 
-        var confirmProcessing = showAlert(Alert.AlertType.CONFIRMATION, "Files was found",
+        Optional<ButtonType> confirmProcessing = showAlert(Alert.AlertType.CONFIRMATION, "Files was found",
                 String.format("Found %s files to process, proceed?", filesToProcess.size()));
 
         if (confirmProcessing.isPresent() && confirmProcessing.get() == ButtonType.OK) {

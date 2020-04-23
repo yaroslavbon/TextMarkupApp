@@ -24,7 +24,7 @@ public class SettingsController {
         String prefix = mkPrefix.getText();
         String suffix = mkSuffix.getText();
 
-        if (prefix.isBlank() || suffix.isBlank()){
+        if (prefix.trim().isEmpty() || suffix.trim().isEmpty()){
             showAlert(Alert.AlertType.ERROR, "Settings saving error",
                     "Can not save empty prefix or suffix");
             return;

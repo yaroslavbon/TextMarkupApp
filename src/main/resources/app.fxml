@@ -56,7 +56,7 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="375.0" vgrow="ALWAYS" />
          </rowConstraints>
          <children>
-            <TextArea fx:id="textArea" onContextMenuRequested="#markTextSegment" prefHeight="200.0" prefWidth="200.0" promptText="While processing a file, select a segment that you want to mark and press right mouse button." wrapText="true" GridPane.rowIndex="1" />
+            <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" promptText="While processing a file, select a segment that you want to mark and press spacebar to mark it." wrapText="true" GridPane.rowIndex="1" />
             <Label fx:id="currentTextLabel" text="No texts to process right now, choose directory with texts first">
                <GridPane.margin>
                   <Insets left="3.0" />

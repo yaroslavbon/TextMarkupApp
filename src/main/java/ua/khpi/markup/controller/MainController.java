@@ -1,6 +1,7 @@
 package ua.khpi.markup.controller;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -8,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -68,14 +71,15 @@ public class MainController {
     }
 
     @FXML
-    void markTextSegment(ContextMenuEvent event) {
+    void markTextSegment(KeyEvent event) {
+        if (event.getCode() != KeyCode.SPACE) return;
         String selectedTextSegment = textArea.getSelectedText();
         if (selectedTextSegment.trim().isEmpty()) return;
 
         String markedTextSegment = markupPrefix + selectedTextSegment + markupSuffix;
 
         String text = textArea.getText();
-        String updatedText = text.replaceFirst(selectedTextSegment, markedTextSegment);
+        String updatedText = text.replace(selectedTextSegment, markedTextSegment);
 
         textArea.deselect();
         textArea.setText(updatedText);
@@ -148,6 +152,14 @@ public class MainController {
         markupPrefix = DEFAULT_MARKUP_PREFIX;
         markupSuffix = DEFAULT_MARKUP_SUFFIX;
         currentFileChangeHistory = new LinkedList<>();
+        tuneTextArea();
+    }
+
+    private void tuneTextArea() {
+        textArea.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, Event::consume);
+        textArea.setOnKeyPressed(this::markTextSegment);
+        textArea.setEditable(false);
+        textArea.setStyle("-fx-opacity: 1;");
     }
 
     private File getDirectoryWithTextsToProcess(ActionEvent event) {

@@ -7,7 +7,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -21,7 +26,11 @@ import ua.khpi.markup.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 import static ua.khpi.markup.util.ControllerUtils.showAlert;
 
@@ -76,13 +85,20 @@ public class MainController {
         String selectedTextSegment = textArea.getSelectedText();
         if (selectedTextSegment.trim().isEmpty()) return;
 
+        //necessary data to save scroll position
+        double scrollPosition = textArea.getScrollTop();
+        int anchor = textArea.getAnchor();
+        int caret = textArea.getCaretPosition();
+
         String markedTextSegment = markupPrefix + selectedTextSegment + markupSuffix;
 
         String text = textArea.getText();
         String updatedText = text.replace(selectedTextSegment, markedTextSegment);
 
-        textArea.deselect();
         textArea.setText(updatedText);
+        textArea.setScrollTop(scrollPosition);
+        textArea.selectRange(anchor, caret);
+        textArea.deselect();
         currentFileChangeHistory.push(updatedText);
     }
 
@@ -128,8 +144,17 @@ public class MainController {
     void undo(ActionEvent event) {
         if (currentFileChangeHistory.size() == 1) return;
 
+        //necessary data to save scroll position
+        double currentScrollPosition = textArea.getScrollTop();
+        int anchor = textArea.getAnchor();
+        int caret = textArea.getCaretPosition();
+
         currentFileChangeHistory.pop();
         textArea.setText(currentFileChangeHistory.peek());
+
+        textArea.setScrollTop(currentScrollPosition);
+        textArea.selectRange(anchor, caret);
+        textArea.deselect();
     }
 
     //what an ugly stuff...

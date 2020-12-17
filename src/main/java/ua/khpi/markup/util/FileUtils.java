@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,7 +47,7 @@ public class FileUtils {
 
     private static void saveFileWithNewContent(Path pathToFile, String fileContent) {
         try {
-            Files.write(pathToFile, fileContent.getBytes());
+            Files.write(pathToFile, Collections.singleton(fileContent), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new FileSavingException(e);
         }
